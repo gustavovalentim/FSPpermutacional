@@ -1,0 +1,10 @@
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\bin\Debug\FlowShopPermutacional.exe.config
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\bin\Debug\FlowShopPermutacional.exe
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\bin\Debug\FlowShopPermutacional.pdb
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.csprojAssemblyReference.cache
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.Form1.resources
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.Properties.Resources.resources
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.csproj.GenerateResource.cache
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.csproj.CoreCompileInputs.cache
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.exe
+C:\Users\gusta\source\repos\FlowShopPermutacional\FlowShopPermutacional\obj\Debug\FlowShopPermutacional.pdb
