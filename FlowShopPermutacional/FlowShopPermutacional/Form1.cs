@@ -17,7 +17,7 @@ namespace FlowShopPermutacional
         {
             InitializeComponent();
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             ProblemaFSP MeuProblema = new ProblemaFSP();
@@ -33,6 +33,8 @@ namespace FlowShopPermutacional
                 SequenciaAtual = SequenciaAtual + "-" + MelhorSequencia.Sequencia[i].ToString();
             }
             MessageBox.Show("O makespan da sequência " + SequenciaAtual + " é " + MelhorSequencia.Makespan.ToString() + " e foi a melhor sequência encontrada");
+            Bitmap DesenhoSolucao = MeuProblema.DesenharSolucaoTarefasNasLinhas(MelhorSequencia);
+            picDesenho.Image = DesenhoSolucao;
         }
 
         private void btnBuscaVizinhamca_Click(object sender, EventArgs e)
