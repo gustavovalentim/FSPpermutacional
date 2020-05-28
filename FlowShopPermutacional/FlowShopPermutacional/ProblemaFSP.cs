@@ -15,34 +15,38 @@ namespace FlowShopPermutacional
         public int NumeroMaquinas;
         public int[] InstantesIniciaisDasMaquinas;
         public int[,] MatrizTemposProcessamento; //Linhas referem-se à tarefas e colunas referem-se à máquinas
-        public int[,] MatrizRetorno;
-        public int[,] MatrizInicio;
-        public int[,] MatrizFim;
-        public int Makespan;
-        public void CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(int[] Sequencia)
+        public DadosSequencia SolucaoAtual;
+        public List<DadosSequencia> ListaSolucoesAnalisadas;
+        public DadosSequencia CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(int[] Sequencia)
         {
+            DadosSequencia DadosRetorno = new DadosSequencia();
             int[] InstanteLiberacaoMaquinas = new int[NumeroMaquinas];
             for(int j=0;j<NumeroMaquinas;j++)
             {
                 InstanteLiberacaoMaquinas[j] = InstantesIniciaisDasMaquinas[j];
             }
-            MatrizRetorno = new int[NumeroTarefas,2*NumeroMaquinas];
+            DadosRetorno.Sequencia = new int[NumeroTarefas];
+            DadosRetorno.MatrizInstantes = new int[NumeroTarefas,2*NumeroMaquinas];
             int TarefaAtual;
             for(int i=0;i<NumeroTarefas;i++)
             {
                 TarefaAtual = Sequencia[i];
-                MatrizRetorno[TarefaAtual, 0] = InstanteLiberacaoMaquinas[0];
-                MatrizRetorno[TarefaAtual, 0 + NumeroMaquinas] = MatrizRetorno[TarefaAtual, 0] + MatrizTemposProcessamento[TarefaAtual, 0];
-                InstanteLiberacaoMaquinas[0] = MatrizRetorno[TarefaAtual, 0 + NumeroMaquinas];
+                DadosRetorno.MatrizInstantes[TarefaAtual, 0] = InstanteLiberacaoMaquinas[0];
+                DadosRetorno.MatrizInstantes[TarefaAtual, 0 + NumeroMaquinas] = DadosRetorno.MatrizInstantes[TarefaAtual, 0] + MatrizTemposProcessamento[TarefaAtual, 0];
+                InstanteLiberacaoMaquinas[0] = DadosRetorno.MatrizInstantes[TarefaAtual, 0 + NumeroMaquinas];
                 for(int j=1;j<NumeroMaquinas;j++)
                 {
-                    MatrizRetorno[TarefaAtual, j] = Maximo(MatrizRetorno[TarefaAtual, NumeroMaquinas + j - 1], InstanteLiberacaoMaquinas[j]);
-                    MatrizRetorno[TarefaAtual, j + NumeroMaquinas] = MatrizRetorno[TarefaAtual, j] + MatrizTemposProcessamento[TarefaAtual, j];
-                    InstanteLiberacaoMaquinas[j] = MatrizRetorno[TarefaAtual, j + NumeroMaquinas];
+                    DadosRetorno.MatrizInstantes[TarefaAtual, j] = Maximo(DadosRetorno.MatrizInstantes[TarefaAtual, NumeroMaquinas + j - 1], InstanteLiberacaoMaquinas[j]);
+                    DadosRetorno.MatrizInstantes[TarefaAtual, j + NumeroMaquinas] = DadosRetorno.MatrizInstantes[TarefaAtual, j] + MatrizTemposProcessamento[TarefaAtual, j];
+                    InstanteLiberacaoMaquinas[j] = DadosRetorno.MatrizInstantes[TarefaAtual, j + NumeroMaquinas];
                 }
             }
-            Makespan = MatrizRetorno[Sequencia[Sequencia.GetLength(0) - 1], NumeroMaquinas * 2 - 1];
-            //return MatrizRetorno;
+            DadosRetorno.Makespan = DadosRetorno.MatrizInstantes[Sequencia[Sequencia.GetLength(0) - 1], NumeroMaquinas * 2 - 1];
+            for(int i=0;i<NumeroTarefas;i++)
+            {
+                DadosRetorno.Sequencia[i] = Sequencia[i];
+            }
+            return DadosRetorno;
         }
         public DadosSequencia EncontraMelhorSequenciaBuscaVizinhanca()
         {
@@ -57,7 +61,7 @@ namespace FlowShopPermutacional
             for (int h=0;h<1000;h++)
             {
                 Sequencia = GerarSequenciaAleatoria(SementeAleatoria.Next(0, 100000000));
-                CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(Sequencia);
+                DadosSequencia DadosSolucaoAleatoria = CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(Sequencia);
                 bool TeveMelhoria = true;
                 while (TeveMelhoria)
                 {
@@ -73,10 +77,10 @@ namespace FlowShopPermutacional
                             }
                             SequenciaVizinhaAtual[i] = Sequencia[j];
                             SequenciaVizinhaAtual[j] = Sequencia[i];
-                            CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaVizinhaAtual);
-                            if (Makespan < DadosMelhorSequencia.Makespan)
+                            DadosSequencia DadosSolucaoVizinhaAtual = CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaVizinhaAtual);
+                            if (DadosSolucaoVizinhaAtual.Makespan < DadosMelhorSequencia.Makespan)
                             {
-                                DadosMelhorSequencia.Makespan = Makespan;
+                                DadosMelhorSequencia.Makespan = DadosSolucaoVizinhaAtual.Makespan;
                                 Movimento[0] = i;
                                 Movimento[1] = j;
                                 TeveMelhoria = true;
@@ -104,6 +108,7 @@ namespace FlowShopPermutacional
             DadosSequencia DadosMelhorSequencia = new DadosSequencia();
             DadosMelhorSequencia.Makespan = 9999999;
             DadosMelhorSequencia.Sequencia = new int[NumeroTarefas];
+            DadosMelhorSequencia.MatrizInstantes = new int[NumeroTarefas, NumeroMaquinas * 2];
             for (int k = 0; k < NumeroSequencias; k++)
             {
                 int[] Sequencia = GerarSequenciaAleatoria(SementeAleatoria.Next(0, 100000000));
@@ -111,14 +116,21 @@ namespace FlowShopPermutacional
                 {
                     Escrever.Write(Sequencia[i].ToString() + ";");
                 }
-                CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(Sequencia);
-                Escrever.WriteLine(Makespan.ToString());
-                if (Makespan < DadosMelhorSequencia.Makespan)
+                DadosSequencia DadosAuxiliar = CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(Sequencia);
+                Escrever.WriteLine(DadosAuxiliar.Makespan.ToString());
+                if (DadosAuxiliar.Makespan < DadosMelhorSequencia.Makespan)
                 {
-                    DadosMelhorSequencia.Makespan = Makespan;
+                    DadosMelhorSequencia.Makespan = DadosAuxiliar.Makespan;
                     for (int i = 0; i < NumeroTarefas; i++)
                     {
                         DadosMelhorSequencia.Sequencia[i] = Sequencia[i];
+                    }
+                    for(int i=0;i<NumeroTarefas;i++)
+                    {
+                        for(int j=0;j<NumeroMaquinas*2;j++)
+                        {
+                            DadosMelhorSequencia.MatrizInstantes[i, j] = DadosAuxiliar.MatrizInstantes[i, j];
+                        }
                     }
                 }
             }
@@ -193,14 +205,14 @@ namespace FlowShopPermutacional
             {
                 Pincel[i] = new SolidBrush(Color.FromArgb(155, Aleatorio.Next(256), Aleatorio.Next(256), Aleatorio.Next(256)));
             }
-            CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaDesenho.Sequencia);
+            //CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaDesenho.Sequencia);
             int Altura = 350 / NumeroMaquinas;
-            double EscalaLargura = 550 / (double)Makespan;
+            double EscalaLargura = 550 / (double)SequenciaDesenho.Makespan;
             for(int i=0;i<NumeroTarefas;i++)
             {
                 for(int j=0;j<NumeroMaquinas;j++)
                 {
-                    Rectangle Retangulo = new Rectangle(25 + (int)(EscalaLargura * MatrizRetorno[i, j]), 25 + Altura * j, (int)(EscalaLargura * (MatrizRetorno[i, j + NumeroMaquinas] - MatrizRetorno[i, j])), Altura);
+                    Rectangle Retangulo = new Rectangle(25 + (int)(EscalaLargura * SequenciaDesenho.MatrizInstantes[i, j]), 25 + Altura * j, (int)(EscalaLargura * (SequenciaDesenho.MatrizInstantes[i, j + NumeroMaquinas] - SequenciaDesenho.MatrizInstantes[i, j])), Altura);
                     g.FillRectangle(Pincel[i], Retangulo);
                 }
             }
@@ -218,16 +230,15 @@ namespace FlowShopPermutacional
             {
                 Pincel[i] = new SolidBrush(Color.FromArgb(175, Aleatorio.Next(256), Aleatorio.Next(256), Aleatorio.Next(256)));
             }
-            CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaDesenho.Sequencia);
+            //CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaDesenho.Sequencia);
             double Altura = 350 / (double)NumeroTarefas;
-            double EscalaLargura = 550 / (double)Makespan;
+            double EscalaLargura = 550 / (double)SequenciaDesenho.Makespan;
             for (int i = 0; i < NumeroTarefas; i++)
             {
-                //int TarefaAtual = i;
                 int TarefaAtual = SequenciaDesenho.Sequencia[i];
                 for (int j = 0; j < NumeroMaquinas; j++)
                 {
-                    Rectangle Retangulo = new Rectangle(25 + (int)(EscalaLargura*MatrizRetorno[TarefaAtual,j]), 25 + (int)(Altura * i), (int)(EscalaLargura * (MatrizRetorno[TarefaAtual, j + NumeroMaquinas] - MatrizRetorno[TarefaAtual, j])), (int)(Altura));
+                    Rectangle Retangulo = new Rectangle(25 + (int)(EscalaLargura*SequenciaDesenho.MatrizInstantes[TarefaAtual,j]), 25 + (int)(Altura * i), (int)(EscalaLargura * (SequenciaDesenho.MatrizInstantes[TarefaAtual, j + NumeroMaquinas] - SequenciaDesenho.MatrizInstantes[TarefaAtual, j])), (int)(Altura));
                     g.FillRectangle(Pincel[j], Retangulo);
                 }
             }
@@ -238,5 +249,6 @@ namespace FlowShopPermutacional
     {
         public int[] Sequencia;
         public int Makespan;
+        public int[,] MatrizInstantes;
     }
 }
