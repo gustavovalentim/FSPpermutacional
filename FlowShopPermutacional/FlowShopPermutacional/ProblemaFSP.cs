@@ -48,6 +48,116 @@ namespace FlowShopPermutacional
             }
             return DadosRetorno;
         }
+        public DadosSequencia BuscaTabu()
+        {
+            DadosSequencia RespostaBuscaTabu = new DadosSequencia();
+            DadosSequencia SequenciaCandidata = new DadosSequencia();
+            DadosSequencia SequenciaAtual = new DadosSequencia();
+            int[,] ListaTabuIteracoes = new int[NumeroTarefas, NumeroTarefas];
+            SequenciaAtual.Sequencia = GerarSequenciaAleatoria(2);
+            SequenciaAtual = CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaAtual.Sequencia);
+            RespostaBuscaTabu.Makespan = SequenciaAtual.Makespan;
+            RespostaBuscaTabu.Sequencia = new int[NumeroTarefas];
+            int MandatoTabu = 6;
+            Random Aleatorio = new Random(1);
+            for(int i=0;i<NumeroTarefas;i++)
+            {
+                RespostaBuscaTabu.Sequencia[i] = SequenciaAtual.Sequencia[i];
+            }
+            int MaximoIteracoes = 100;
+            int NumeroAtualIteracoes = 0;
+            while (NumeroAtualIteracoes<MaximoIteracoes)
+            {
+                for(int i=0;i<NumeroTarefas;i++)
+                {
+                    for(int j=0;j<NumeroTarefas;j++)
+                    {
+                        if(ListaTabuIteracoes[i,j] > 0)
+                        {
+                            ListaTabuIteracoes[i, j]--;
+                        }
+                    }
+                }
+                SequenciaCandidata = EncontraMelhorVizinho(SequenciaAtual, ListaTabuIteracoes);
+                if(SequenciaCandidata.Makespan < RespostaBuscaTabu.Makespan)
+                {
+                    RespostaBuscaTabu.Makespan = SequenciaCandidata.Makespan;
+                    for(int i=0;i<NumeroTarefas;i++)
+                    {
+                        RespostaBuscaTabu.Sequencia[i] = SequenciaCandidata.Sequencia[i];
+                    }
+                    SequenciaAtual.Makespan = SequenciaCandidata.Makespan;
+                    for (int i = 0; i < NumeroTarefas; i++)
+                    {
+                        SequenciaAtual.Sequencia[i] = SequenciaCandidata.Sequencia[i];
+                    }
+                    ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[0], SequenciaCandidata.MovimentoAnterior[1]] = MandatoTabu;
+                    ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[1], SequenciaCandidata.MovimentoAnterior[0]] = MandatoTabu;
+                }
+                else if(SequenciaCandidata.Makespan < SequenciaAtual.Makespan)
+                {
+                    SequenciaAtual.Makespan = SequenciaCandidata.Makespan;
+                    for (int i = 0; i < NumeroTarefas; i++)
+                    {
+                        SequenciaAtual.Sequencia[i] = SequenciaCandidata.Sequencia[i];
+                    }
+                    ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[0], SequenciaCandidata.MovimentoAnterior[1]] = MandatoTabu;
+                    ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[1], SequenciaCandidata.MovimentoAnterior[0]] = MandatoTabu;
+                }
+                else
+                {
+                    if(Aleatorio.NextDouble()<0.2)
+                    {
+                        SequenciaAtual.Makespan = SequenciaCandidata.Makespan;
+                        for (int i = 0; i < NumeroTarefas; i++)
+                        {
+                            SequenciaAtual.Sequencia[i] = SequenciaCandidata.Sequencia[i];
+                        }
+                        ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[0], SequenciaCandidata.MovimentoAnterior[1]] = MandatoTabu;
+                        ListaTabuIteracoes[SequenciaCandidata.MovimentoAnterior[1], SequenciaCandidata.MovimentoAnterior[0]] = MandatoTabu;
+                    }
+                }
+                NumeroAtualIteracoes++;
+            }
+            return RespostaBuscaTabu;
+        }
+        public DadosSequencia EncontraMelhorVizinho(DadosSequencia SequenciaAtual, int[,] Tabu)
+        {
+            DadosSequencia MelhorVizinho = new DadosSequencia();
+            MelhorVizinho.Makespan = 9999999;
+            MelhorVizinho.MovimentoAnterior = new int[2];
+            for (int i = 0; i < NumeroTarefas; i++)
+            {
+                for (int j = i + 1; j < NumeroTarefas; j++)
+                {
+                    if(Tabu[i,j] == 0)
+                    {
+                        int[] SequenciaCandidata = new int[NumeroTarefas];
+                        for (int k = 0; k < NumeroTarefas; k++)
+                        {
+                            SequenciaCandidata[k] = SequenciaAtual.Sequencia[k];
+                        }
+                        SequenciaCandidata[i] = SequenciaAtual.Sequencia[j];
+                        SequenciaCandidata[j] = SequenciaAtual.Sequencia[i];
+                        DadosSequencia DadosSequenciaCandidata = CalcularInstantesInicioFimCadaTarefaEmCadaMaquina(SequenciaCandidata);
+                        if (DadosSequenciaCandidata.Makespan < MelhorVizinho.Makespan)
+                        {
+                            MelhorVizinho.Makespan = DadosSequenciaCandidata.Makespan;
+                            MelhorVizinho.MovimentoAnterior[0] = i;
+                            MelhorVizinho.MovimentoAnterior[1] = j;
+                        }
+                    }
+                }
+            }
+            MelhorVizinho.Sequencia = new int[NumeroTarefas];
+            for(int k=0;k<NumeroTarefas;k++)
+            {
+                MelhorVizinho.Sequencia[k] = SequenciaAtual.Sequencia[k];
+            }
+            MelhorVizinho.Sequencia[MelhorVizinho.MovimentoAnterior[0]] = SequenciaAtual.Sequencia[MelhorVizinho.MovimentoAnterior[1]];
+            MelhorVizinho.Sequencia[MelhorVizinho.MovimentoAnterior[1]] = SequenciaAtual.Sequencia[MelhorVizinho.MovimentoAnterior[0]];
+            return MelhorVizinho;
+        }
         public DadosSequencia EncontraMelhorSequenciaBuscaVizinhanca()
         {
             Random SementeAleatoria = new Random();
@@ -250,5 +360,6 @@ namespace FlowShopPermutacional
         public int[] Sequencia;
         public int Makespan;
         public int[,] MatrizInstantes;
+        public int[] MovimentoAnterior;
     }
 }

@@ -33,6 +33,7 @@
             this.lblNumeroSequencias = new System.Windows.Forms.Label();
             this.btnBuscaVizinhamca = new System.Windows.Forms.Button();
             this.picDesenho = new System.Windows.Forms.PictureBox();
+            this.btnTabu = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picDesenho)).BeginInit();
             this.SuspendLayout();
             // 
@@ -81,11 +82,22 @@
             this.picDesenho.TabIndex = 4;
             this.picDesenho.TabStop = false;
             // 
+            // btnTabu
+            // 
+            this.btnTabu.Location = new System.Drawing.Point(12, 154);
+            this.btnTabu.Name = "btnTabu";
+            this.btnTabu.Size = new System.Drawing.Size(75, 23);
+            this.btnTabu.TabIndex = 5;
+            this.btnTabu.Text = "Tabu";
+            this.btnTabu.UseVisualStyleBackColor = true;
+            this.btnTabu.Click += new System.EventHandler(this.btnTabu_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnTabu);
             this.Controls.Add(this.picDesenho);
             this.Controls.Add(this.btnBuscaVizinhamca);
             this.Controls.Add(this.lblNumeroSequencias);
@@ -106,6 +118,7 @@
         private System.Windows.Forms.Label lblNumeroSequencias;
         private System.Windows.Forms.Button btnBuscaVizinhamca;
         private System.Windows.Forms.PictureBox picDesenho;
+        private System.Windows.Forms.Button btnTabu;
     }
 }
 

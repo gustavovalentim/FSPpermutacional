@@ -54,5 +54,22 @@ namespace FlowShopPermutacional
             }
             MessageBox.Show("O makespan da sequência " + SequenciaAtual + " é " + MelhorSequencia.Makespan.ToString() + " e foi a melhor sequência encontrada");
         }
+
+        private void btnTabu_Click(object sender, EventArgs e)
+        {
+            ProblemaFSP MeuProblema = new ProblemaFSP();
+            MeuProblema.LerProblema(@"D:\Teste\ExemploFSP2.txt");
+            Stopwatch Cronometro = new Stopwatch();
+            Cronometro.Start();
+            DadosSequencia MelhorSequencia = MeuProblema.BuscaTabu();
+            Cronometro.Stop();
+            MessageBox.Show(Cronometro.ElapsedMilliseconds.ToString());
+            string SequenciaAtual = MelhorSequencia.Sequencia[0].ToString();
+            for (int i = 1; i < MelhorSequencia.Sequencia.GetLength(0); i++)
+            {
+                SequenciaAtual = SequenciaAtual + "-" + MelhorSequencia.Sequencia[i].ToString();
+            }
+            MessageBox.Show("O makespan da sequência " + SequenciaAtual + " é " + MelhorSequencia.Makespan.ToString() + " e foi a melhor sequência encontrada");
+        }
     }
 }
